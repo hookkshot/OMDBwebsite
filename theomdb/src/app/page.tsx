@@ -19,24 +19,61 @@ interface Media {
   }
 }
 
-const MediaListItem = (props: {media: Media}) => {
-  return props.media.name;
+interface MediaSearchResult {
+  ImdbId: string;
+  Title: string;
+  Type: string;
+  Year: string;
+  Poster: string;
+}
+
+const omdbApi = "http://www.omdbapi.com/?i=tt3896198&apikey=f9d0bba"
+
+const MediaListItem = (props: {media: MediaSearchResult}) => {
+  return <div tabIndex={0} className={styles.mediaListItem}>
+      <img src={props.media.Poster} className={styles.mediaListItemPoster} />
+      <div>
+        <h4>{props.media.Title}</h4>
+        <div>{props.media.Year}</div>
+      </div>
+    </div>;
 }
 
 export default function Home() {
-  const [medias, setMedias] = useState<Media[]>([])
+  const [medias, setMedias] = useState<MediaSearchResult[]>([])
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     setMedias([]);
     setLoading(false);
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    const getMedia = setTimeout(async () => {
+      if(searchQuery !== "") {
+        const response = await fetch(`${omdbApi}&s=${searchQuery}`);
+
+        const json = await response.json();
+        setMedias(json.Search);
+        console.log(json);
+        setLoading(false);
+      } else {
+        setMedias([]);
+        setLoading(false);
+      }
+    }, 750);
+
+    return () => clearTimeout(getMedia);
+      
+  }, [ searchQuery ])
 
   return (
     <div className={styles.page}>
       <header className={styles.header}>
         <div className={styles.headerStretch}>
-          <input />
+          <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
         </div>
         <div>
           <input type="range" />
@@ -44,11 +81,11 @@ export default function Home() {
       </header>
       <main className={styles.main}>
         <div className={styles.mediaList}>
-          <div>{medias.length} results</div>
-          {loading ? <div>Loading...</div> : 
+          <div className={styles.mediaListItem}>{medias.length} results</div>
+          {loading ? <div className={styles.mediaListItem}>Loading...</div> : 
             <div>{medias.length > 0 ? medias.map((m) => {
-              return <MediaListItem key={m.id} media={m} />
-              }) : <div>No results</div>}
+              return <MediaListItem key={m.ImdbId} media={m} />
+              }) : <div className={styles.mediaListItem}>No results</div>}
             </div>
           }
         </div>

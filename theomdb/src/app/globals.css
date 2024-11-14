@@ -35,6 +35,12 @@ a {
   text-decoration: none;
 }
 
+input {
+  background-color: transparent;
+  border: none;
+   
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
