@@ -3,34 +3,31 @@ import styles from "./page.module.css";
 import { useEffect, useState } from "react";
 
 interface Media {
-  id: string;
-  name: string;
-  year: string;
-  imageUrl: string;
-  description: string;
-  ageRating: string;
-  genre: string;
-  cast: string;
-  length: string;
-  ratings: {
-    imdb: string;
-    rottenTomatoes: string;
-    metacritic: string;
-  }
+  Title: string;
+  Year: string;
+  Rated: string;
+  Genre: string;
+  Director: string;
+  Actors: string;
+  Poster: string;
+  Ratings: [];
+  imdbID: string;
+  Plot: string;
+  Runtime: string;
 }
 
 interface MediaSearchResult {
-  ImdbId: string;
+  imdbID: string;
   Title: string;
   Type: string;
   Year: string;
   Poster: string;
 }
 
-const omdbApi = "http://www.omdbapi.com/?i=tt3896198&apikey=f9d0bba"
+const omdbApi = "http://www.omdbapi.com/?apikey=f9d0bba"
 
-const MediaListItem = (props: {media: MediaSearchResult}) => {
-  return <div tabIndex={0} className={styles.mediaListItem}>
+const MediaListItem = (props: {media: MediaSearchResult, onClick: () => void, selected: boolean }) => {
+  return <div tabIndex={0} className={styles.mediaListItem} onClick={props.onClick}>
       <img src={props.media.Poster} className={styles.mediaListItemPoster} />
       <div>
         <h4>{props.media.Title}</h4>
@@ -39,10 +36,34 @@ const MediaListItem = (props: {media: MediaSearchResult}) => {
     </div>;
 }
 
+const MediaDisplay = (props: {media: Media}) => {
+  return <>
+    <div className={styles.meta}>
+      <img src={props.media.Poster} alt={props.media.Title} className={styles.poster} />
+      <div className={styles.metaItems}>
+        <h2>{props.media.Title}</h2>
+        <div>
+          <span className={styles.rated}>{props.media.Rated}</span> {props.media.Year} - {props.media.Genre} - {props.media.Runtime}
+        </div>
+        <div>{props.media.Actors}</div>
+      </div>
+    </div>
+    <hr />
+    <p>{props.media.Plot}</p>
+    <hr />
+    <div>
+      
+    </div>
+  </>
+}
+
 export default function Home() {
   const [medias, setMedias] = useState<MediaSearchResult[]>([])
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [selectedMedia, setSelectedMedia] = useState("");
+  const [selectedMediaResult, setSelectedMediaResult] = useState<Media | undefined>(undefined);
 
   useEffect(() => {
     setMedias([]);
@@ -57,8 +78,8 @@ export default function Home() {
 
         const json = await response.json();
         setMedias(json.Search);
-        console.log(json);
         setLoading(false);
+        setSelectedMedia("");
       } else {
         setMedias([]);
         setLoading(false);
@@ -68,6 +89,25 @@ export default function Home() {
     return () => clearTimeout(getMedia);
       
   }, [ searchQuery ])
+
+  useEffect(() => {
+    const getMedia = setTimeout(async () => {
+      if(selectedMedia !== ""){
+        const response = await fetch(`${omdbApi}&i=${selectedMedia}`);
+
+        if(!response.ok) {
+          //Error control          
+        } else {
+          const json = await response.json();
+          setSelectedMediaResult(json);
+        }
+      }else{
+        setSelectedMediaResult(undefined);
+      }
+    }, 1000);
+
+    return () => clearTimeout(getMedia);
+  }, [selectedMedia])
 
   return (
     <div className={styles.page}>
@@ -83,14 +123,19 @@ export default function Home() {
         <div className={styles.mediaList}>
           <div className={styles.mediaListItem}>{medias.length} results</div>
           {loading ? <div className={styles.mediaListItem}>Loading...</div> : 
-            <div>{medias.length > 0 ? medias.map((m) => {
-              return <MediaListItem key={m.ImdbId} media={m} />
+            <div>{medias.length > 0 ? medias.map((m, index) => {
+              return <MediaListItem 
+                key={index}
+                media={m}
+                onClick={() => setSelectedMedia(m.imdbID)}
+                selected={m.imdbID === selectedMedia}
+                />
               }) : <div className={styles.mediaListItem}>No results</div>}
             </div>
           }
         </div>
         <div className={styles.mediaDisplay}>
-          Media
+          {selectedMediaResult !== undefined ? <MediaDisplay media={selectedMediaResult} /> : "No media selected."}
         </div>
       </main>
     </div>

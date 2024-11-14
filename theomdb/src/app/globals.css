@@ -38,7 +38,7 @@ a {
 input {
   background-color: transparent;
   border: none;
-   
+  outline: none;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -7,6 +7,8 @@
   display: flex;
   flex-direction: column;
   font-family: var(--font-geist-sans);
+
+  height: 100vh;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,6 +21,7 @@
 
 .header {
   height: 150px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -37,12 +40,13 @@
   flex-grow: 1;
   display: flex;
   flex-direction: row;
-  gap: 32px;
+  overflow: hidden;
 }
 
 .mediaList {
   width: 33%;
   border-right: solid var(--border-color) 1px;
+  overflow-y: auto;
 
   .mediaListItem {
     padding: 30px;
@@ -64,6 +68,35 @@
 
 .mediaDisplay {
   width: 67%;
+  padding: 30px;
+
+
+  .meta {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+  }
+
+  .metaItems {
+    & > *:not(:first-child) {
+      margin-top: 12px;
+    }
+  }
+
+  .poster {
+    width: 33%;
+  }
+
+  .rated {
+    border: 1px #fff solid;
+    padding: 2px 4px;
+    border-radius: 6px;
+    margin-right: 5px;
+  }
+
+  & > *:not(:first-child) {
+    margin-top: 30px;
+  }
 }
 
 @media (max-width: 600px) {
