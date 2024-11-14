@@ -78,13 +78,36 @@
   }
 
   .metaItems {
+    display: flex;
+    flex-direction: column;
     & > *:not(:first-child) {
       margin-top: 12px;
     }
   }
 
+  .metaWatchlist {
+    flex-grow: 1;
+    text-align: right;
+  }
+
+  .mediaRatings {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+
+    .mediaRating {
+      &:not(:first-child) {
+        border-left: 1px solid var(--border-color);
+      }
+      text-align: center;
+      flex-grow: 1;
+    }
+  }
+
   .poster {
     width: 33%;
+    max-height: 350px;
   }
 
   .rated {

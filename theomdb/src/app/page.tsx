@@ -10,10 +10,15 @@ interface Media {
   Director: string;
   Actors: string;
   Poster: string;
-  Ratings: [];
+  Ratings: MediaRating[];
   imdbID: string;
   Plot: string;
   Runtime: string;
+}
+
+interface MediaRating {
+  Source: string;
+  Value: string;
 }
 
 interface MediaSearchResult {
@@ -41,6 +46,7 @@ const MediaDisplay = (props: {media: Media}) => {
     <div className={styles.meta}>
       <img src={props.media.Poster} alt={props.media.Title} className={styles.poster} />
       <div className={styles.metaItems}>
+        <div className={styles.metaWatchlist}>Watchlist</div>
         <h2>{props.media.Title}</h2>
         <div>
           <span className={styles.rated}>{props.media.Rated}</span> {props.media.Year} - {props.media.Genre} - {props.media.Runtime}
@@ -51,8 +57,13 @@ const MediaDisplay = (props: {media: Media}) => {
     <hr />
     <p>{props.media.Plot}</p>
     <hr />
-    <div>
-      
+    <div className={styles.mediaRatings}>
+      {props.media.Ratings.map((r, index) => {
+        return <div key={index} className={styles.mediaRating}>
+          <h3>{r.Value}</h3>
+          <p>{r.Source}</p>
+        </div>;
+      })}
     </div>
   </>
 }
