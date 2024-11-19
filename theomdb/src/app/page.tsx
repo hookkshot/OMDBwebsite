@@ -41,12 +41,12 @@ const MediaListItem = (props: {media: MediaSearchResult, onClick: () => void, se
     </div>;
 }
 
-const MediaDisplay = (props: {media: Media}) => {
+const MediaDisplay = (props: {media: Media, watched: boolean, setWatched: (id: string) => void}) => {
   return <>
     <div className={styles.meta}>
       <img src={props.media.Poster} alt={props.media.Title} className={styles.poster} />
       <div className={styles.metaItems}>
-        <div className={styles.metaWatchlist}>Watchlist</div>
+        <div className={styles.metaWatchlist}><button className={`${props.watched ? styles.watched : undefined}`} onClick={() => props.setWatched(props.media.imdbID)}>Watchlist</button></div>
         <h2>{props.media.Title}</h2>
         <div>
           <span className={styles.rated}>{props.media.Rated}</span> {props.media.Year} - {props.media.Genre} - {props.media.Runtime}
@@ -90,6 +90,8 @@ export default function Home() {
   const [selectedMediaResult, setSelectedMediaResult] = useState<Media | undefined>(undefined);
 
   const [ loadingMore, setLoadingMore ] = useState(false);
+
+  const [ watchlist, setWatchlist ] = useState<string[]>([]);
 
   const filterMediaByYear = (result: MediaSearchResult[]) => {
     return result.filter(m => {
@@ -175,7 +177,6 @@ export default function Home() {
       const json = await response.json();
       if(json.Error !== undefined){
       }else{
-        const some = medias.filter(d => d.Title == "");
         setMedias((current) => {
           return [
             ...current,
@@ -189,6 +190,19 @@ export default function Home() {
       }
     }
     setLoadingMore(false);
+  }
+
+  const toggleWatchlist = (id: string) => {
+    const index = watchlist.indexOf(id)
+    if(index === -1){
+      setWatchlist((list) => {
+        return [ ...list, id];
+      })
+    } else {
+      setWatchlist((list) => {
+        return [ ... list.filter(l => l !== id)];
+      })
+    }
   }
 
   return (
@@ -240,7 +254,7 @@ export default function Home() {
           { mediaLoaded !== mediaTotal && !loadingMore && <div className={styles.mediaListItem} onClick={() => loadMore()}>Load more</div>}
         </div>
         <div className={styles.mediaDisplay}>
-          {selectedMediaResult !== undefined ? <MediaDisplay media={selectedMediaResult} /> : "No media selected."}
+          {selectedMediaResult !== undefined ? <MediaDisplay media={selectedMediaResult} watched={watchlist.some(w => w === selectedMediaResult.imdbID)} setWatched={(id) => toggleWatchlist(id)} /> : "No media selected."}
         </div>
       </main>
     </div>

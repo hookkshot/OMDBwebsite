@@ -148,6 +148,8 @@
   }
 }
 
+
+
 .mediaDisplay {
   width: 67%;
   padding: 30px;
@@ -171,7 +173,20 @@
   .metaWatchlist {
     flex-grow: 1;
     text-align: right;
+    
+    &>button {
+      border: 1px #000 solid;
+      border-radius: 5px;
+      outline: none;
+      background: none;
+      padding: 7px 15px;
+      cursor: pointer;
+    }
+    .watched {
+      background-color: #dddd12;
+    }
   }
+  
 
   .mediaRatings {
     display: flex;
